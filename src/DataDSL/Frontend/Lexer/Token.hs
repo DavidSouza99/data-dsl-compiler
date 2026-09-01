@@ -21,12 +21,22 @@ data Token = Token
 
 -- Define o tipo Lexeme, que representa os diferentes tipos de tokens que podem ser reconhecidos pelo lexer.
 data Lexeme
-    = TLoad 
-    | TFilter 
-    | TSelect 
-    | TIdent String
-    | TNumber Int
-    deriving (Show)
+    = TLoad             -- Representa a palavra-chave "load".
+    | TFilter           -- Representa a palavra-chave "filter".
+    | TSelect           -- Representa a palavra-chave "select".
+    | TString String    -- Representa uma string entre aspas duplas.
+    | TIdent String     -- Representa um identificador, que é uma sequência de letras minúsculas e dígitos.
+    | TNumber Int       -- Representa um número inteiro.
+    | TDouble Double    -- Representa um número decimal.
+    | TComma            -- Representa o símbolo de vírgula ','.
+    | TGt               -- Representa o símbolo de maior '>'.
+    | TLt               -- Representa o símbolo de menor '<'.
+    | TGe               -- Representa o símbolo de maior ou igual '>='.
+    | TLe               -- Representa o símbolo de menor ou igual '<='.
+    | TEq               -- Representa o símbolo de igual '='.
+    | TNotEq            -- Representa o símbolo de diferente '!='.
+    | TEOF              -- Representa o fim do arquivo.
+    deriving (Show, Eq)
 
 -- Define o tipo State, que representa o estado atual do lexer, incluindo linha, coluna, string acumulada e a lista de tokens reconhecidos até o momento.
 type State = (Line, Column, String, [Token])
