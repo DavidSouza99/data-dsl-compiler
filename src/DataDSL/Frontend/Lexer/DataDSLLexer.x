@@ -1,4 +1,4 @@
-{
+{ -- Cabeçalho do arquivo .x precisa ficar entre chaves, para que o Alex não tente interpretá-lo como regras de token.
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 module DataDSL.Frontend.Lexer.DataDSLLexer where
 
@@ -37,10 +37,37 @@ tokens :-       -- Deve ser plural para ser reconhecida pelo Alex
 -- devolve um Token completo (com posição), dentro da mônada Alex. simpleToken é uma função auxiliar
 -- que faz esse trabalho de "empacotar" um Lexeme sem valor associado (TLParen, TPlus, etc.) num Token completo, capturando automaticamente a posição.
 
+{ -- Rodapé do arquivo .x precisa ficar entre chaves, para que o Alex não tente interpretá-lo como regras de token.
+
+simpleToken :: Lexeme -> AlexInput -> Int -> Alex Token
+simpleToken lx (AlexPn _ line col, _, _, _) len = 
+    return (Token (line, col) lx)
+
+mkNumber :: AlexInput -> Int -> Alex Token
+mkNumber (AlexPn _ line col, _, _, str) len =
+    let numStr = take len str             -- take len str, diz para pegar os primeiros len caracteres da string str.
+    in if elem '.' numStr
+        then return (Token (line, col) (TDouble (read numStr))) -- Se houver um ponto, é um número decimal (Double).
+        else return (Token (line, col) (TNumber (read numStr)))   -- Caso contrário, é um número inteiro (Int).
+
+mkIdent :: AlexInput -> Int -> Alex Token
+mkIdent (AlexPn _ line col, _, _, str) len =
+    let identStr = take len str
+    in return (Token (line, col) (TIdent identStr))
+
+mkString :: AlexInput -> Int -> Alex Token
+mkString (AlexPn _ line col, _, _, str) len =
+    let strContent = take (len - 2) (drop 1 str) -- Remove as aspas duplas do início e do fim da string. drop 1 str remove a primeira aspa, e take (len - 2) pega o restante, excluindo a última aspa.
+    in return (Token (line, col) (TString strContent))
+
 data AlexUserState = AlexUserState{
   layerLevel :: Int
   }
 alexInitUserState :: AlexUserState
 alexInitUserState = AlexUserState{
     layerLevel = 0
+}
+
+alexEOF :: Alex Token
+alexEOF = return (Token (0, 0) TEOF)
 }
