@@ -12,7 +12,7 @@ $digit = 0-9
 $alphaLower = a-z
 $alphaUpper = A-Z
 
-@number = $digit+ ('.' $digit+)? -- Um número é um ou mais dígitos, possivelmente seguido por um ponto e mais dígitos (para números decimais).
+@number = $digit+ ("." $digit+)? -- Um número é um ou mais dígitos, possivelmente seguido por um ponto e mais dígitos (para números decimais).
 @ident = $alphaLower ($alphaLower | $digit)* -- Um identificador começa com uma letra minúscula, seguida por letras minúsculas ou dígitos.
 
 tokens :-       -- Deve ser plural para ser reconhecida pelo Alex
@@ -70,4 +70,16 @@ alexInitUserState = AlexUserState{
 
 alexEOF :: Alex Token
 alexEOF = return (Token (0, 0) TEOF)
+
+tokenize :: String -> Either String [Token]
+tokenize input = runAlex input loop
+    where
+        loop = do
+            tok <- alexMonadScan
+            case lexeme tok of
+                TEOF -> return []
+                _ -> (tok :) <$> loop
+
+
 }
+

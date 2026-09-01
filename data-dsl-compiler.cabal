@@ -27,5 +27,6 @@ library
   import:           common-opts
   exposed-modules:
       DataDSL.Frontend.Lexer.Token
+      DataDSL.Frontend.Lexer.AdHocLexer
       DataDSL.Frontend.Lexer.DataDSLLexer
   hs-source-dirs:   src
